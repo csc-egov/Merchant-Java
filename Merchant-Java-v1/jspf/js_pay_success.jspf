@@ -1,0 +1,68 @@
+
+<style>
+.btn-default{background:#e6e6e6;}
+.padding-btm{padding-bottom:5px;}
+.bg{background:#f2f2f2;border-right:3px solid #fff;min-height: 560px;}
+.bg-top{background:#f2f2f2;border-right:3px solid #fff;min-height: 290px;}
+.solidline{margin-top:20px;}
+</style>
+
+
+<script src="js/jquery.min.js"></script>
+<script src="js/modernizr.custom.js"></script>
+<script src="js/jquery.easing.1.3.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<script>
+	$(document).ready(function(){
+		postToFields();
+<% for (Map.Entry<String, Object> entry : api_calls.entrySet()) { %>
+		$('#btn_<%= entry.getKey() %>').click(function(){
+			doApiReq('<%= entry.getKey() %>');
+		});
+<% } %>
+	});
+	
+	function updateInputFields(){
+		
+	};
+
+	function doApiReq(api_name){
+		//alert(api_name + " : API Call");
+		var api_calls_str = '<%= api_calls_str %>';
+		var api_calls = JSON.parse(api_calls_str);
+		
+		var data = {};//array();
+		var api_parameters = api_calls[api_name];
+
+		for(var params in api_parameters ){
+			var param_name = api_parameters[params];
+			var pv = $('#api_input_' + api_parameters[params]).val();
+			if(!pv){
+				alert('Required Parameter ' + param_name + ' is not set');
+				return;
+			}
+			data[param_name] = pv;
+		}
+		var url = 'api.jsp?api_name=' + api_name;
+		//alert("Data: " + data);
+		$.post( url, data )
+			.done(function( data ) {
+				//alert( "Data Loaded: " + data );
+				var text = "";
+				var dataArray = JSON.parse(data);
+				for(var iid in dataArray)
+					text += "<br />" + iid + " = " + dataArray[iid];
+				$('#api_resp').html(text);
+		});
+	};
+	
+	function postToFields(){
+
+        var posted = '<%= posted_val_str %>';
+		var pData = JSON.parse(posted);
+		for(var iid in pData){
+			$('#api_input_' + iid).val(pData[iid]);
+		}
+	};
+</script>
